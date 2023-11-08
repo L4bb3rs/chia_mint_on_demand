@@ -49,21 +49,33 @@ async def create_nft_image(custom_text: str) -> str:
                 except:
                     await asyncio.sleep(3)
                     task_counter += 1
-                    print(f"Error x1")
+                    print("Error x1")
                     if task_counter == 5:
                         return
-                    pass
-
             status = task_json["status"]
             if status == "pending":
                 print("waiting")
                 await asyncio.sleep(10)
                 continue
 
-            if status != "succeeded":
+            if status == "rejected":
                 print(f"Status {status}")
 
-                if status == "cancelled" or status == "failed":
+                print(f"error: {status}")
+                print(f"error: {task_json}")
+                if "attacks" in request_json["prompt"]["caption"]:
+                    request_json["prompt"]["caption"] = request_json["prompt"]["caption"].replace("attacks", "")
+
+                response = await session.post(url, json=request_json)
+                json_response = await response.json()
+                task_id = json_response["id"]
+                task_url = f"{task_base}{task_id}"
+                await asyncio.sleep(3)
+                continue
+            elif status != "succeeded":
+                print(f"Status {status}")
+
+                if status in ["cancelled", "failed"]:
                     print(f"error: {status}")
                     print(f"error: {task_json}")
                     response = await session.post(url, json=request_json)
@@ -73,18 +85,6 @@ async def create_nft_image(custom_text: str) -> str:
                     await asyncio.sleep(3)
                     continue
 
-                if status == "rejected":
-                    print(f"error: {status}")
-                    print(f"error: {task_json}")
-                    if "attacks" in request_json["prompt"]["caption"]:
-                        request_json["prompt"]["caption"] = request_json["prompt"]["caption"].replace("attacks", "")
-
-                    response = await session.post(url, json=request_json)
-                    json_response = await response.json()
-                    task_id = json_response["id"]
-                    task_url = f"{task_base}{task_id}"
-                    await asyncio.sleep(3)
-                    continue
                 await asyncio.sleep(3)
                 print(f"error: {status}")
                 print(task_json)

@@ -135,8 +135,6 @@ class WalletServer:
 
                 await self.database_api.create_mint_task(parent_id=parent_id.hex(), to_puzzle_hash=to_address, custom_text=memo)
                 print("Creating a mint task")
-                pass
-
             await asyncio.sleep(30)
 
     # mint
@@ -251,7 +249,7 @@ class WalletServer:
             if standard_balance > 0 and standard_balance == standard_total:
                 mint = True
 
-            if mint is False:
+            if not mint:
                 continue
 
             # Get pending mints
@@ -271,14 +269,12 @@ class WalletServer:
             if task.marmot_image_url is not None and task.marmot_image_url != "":
                 image_path = task.marmot_image_url
             else:
-                for i in range(0, 3):
+                for _ in range(0, 3):
                     try:
                         image_path = await create_nft_image(task.custom_text)
                         break
                     except Exception as e:
-                        print(f"Exception in create_nft image")
-                        pass
-
+                        print("Exception in create_nft image")
                 if image_path is None:
                     try:
                         image_path = await create_nft_image("")
