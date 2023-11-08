@@ -47,23 +47,26 @@ class DatabaseApi:
         return post.marmot_id + 1
 
     async def get_mint_task(self, parent_id) -> Optional[MintTask]:
-        task = await MintTask.query.where(MintTask.parent_id == parent_id).gino.one_or_none()
-        return task
+        return await MintTask.query.where(
+            MintTask.parent_id == parent_id
+        ).gino.one_or_none()
 
     async def create_mint_task(self, parent_id: str, to_puzzle_hash: str, custom_text: str):
         marmot_id = await self.get_mint_id()
-        mint = await MintTask.create(
-            marmot_id = marmot_id,
-            to_address = to_puzzle_hash,
-            status =0,
+        return await MintTask.create(
+            marmot_id=marmot_id,
+            to_address=to_puzzle_hash,
+            status=0,
             custom_text=custom_text,
-            valid_from = int(time.time()),
+            valid_from=int(time.time()),
             parent_id=parent_id,
-            valid_to = self.max_timestamp
+            valid_to=self.max_timestamp,
         )
-        return mint
 
     async def get_pending_tasks(self) -> List[MintTask]:
         ordering = MintTask.marmot_id.asc()
-        tasks = await MintTask.query.order_by(ordering).where(MintTask.status == 0).gino.all()
-        return tasks
+        return (
+            await MintTask.query.order_by(ordering)
+            .where(MintTask.status == 0)
+            .gino.all()
+        )

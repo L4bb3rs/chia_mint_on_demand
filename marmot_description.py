@@ -30,5 +30,4 @@ async def fix_grammar(prompt):
       frequency_penalty=0.0,
       presence_penalty=0.0
     )
-    fixed = response["choices"][0]["text"].replace("\n\n", "")
-    return fixed
+    return response["choices"][0]["text"].replace("\n\n", "")

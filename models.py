@@ -26,7 +26,7 @@ class MintTask(db.Model):  # type: ignore # noqa
     valid_to = db.Column(db.Integer(), nullable=False)
 
     def __str__(self):
-        return str(self.__class__) + ": " + str(self.__dict__)
+        return f"{str(self.__class__)}: {str(self.__dict__)}"
 
 db.Index("index_MintTask_valid_from", MintTask.valid_from)
 db.Index("index_MintTask_valid_to", MintTask.valid_to)
